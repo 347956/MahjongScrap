@@ -1,4 +1,5 @@
 ## 1.0.5
+- Added some winter themed paintings
 - Fixed the "Red Five Spawn weight" config having no effect (red fives used the normal tile weight)
 - Items missing from the asset bundle are now skipped with a warning instead of breaking loading
 - Spawn weight configs are now limited to 0-200

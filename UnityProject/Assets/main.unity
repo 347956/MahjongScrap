@@ -123,6 +123,89 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1001 &457523163
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2141258549381602142, guid: bc1cbff3ee0a55a4aa3369c1c318a7a9,
+        type: 3}
+      propertyPath: m_Name
+      value: MahjongSoulWinter
+      objectReference: {fileID: 0}
+    - target: {fileID: 6118687413365319416, guid: bc1cbff3ee0a55a4aa3369c1c318a7a9,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6118687413365319416, guid: bc1cbff3ee0a55a4aa3369c1c318a7a9,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6118687413365319416, guid: bc1cbff3ee0a55a4aa3369c1c318a7a9,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6118687413365319416, guid: bc1cbff3ee0a55a4aa3369c1c318a7a9,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6118687413365319416, guid: bc1cbff3ee0a55a4aa3369c1c318a7a9,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6118687413365319416, guid: bc1cbff3ee0a55a4aa3369c1c318a7a9,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6118687413365319416, guid: bc1cbff3ee0a55a4aa3369c1c318a7a9,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6118687413365319416, guid: bc1cbff3ee0a55a4aa3369c1c318a7a9,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6118687413365319416, guid: bc1cbff3ee0a55a4aa3369c1c318a7a9,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6118687413365319416, guid: bc1cbff3ee0a55a4aa3369c1c318a7a9,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7246142410858366995, guid: bc1cbff3ee0a55a4aa3369c1c318a7a9,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 2128307507
+      objectReference: {fileID: 0}
+    - target: {fileID: 7333273183047195701, guid: bc1cbff3ee0a55a4aa3369c1c318a7a9,
+        type: 3}
+      propertyPath: headerText
+      value: Mahjong Soul Winter Painting
+      objectReference: {fileID: 0}
+    - target: {fileID: 8494856505445801561, guid: bc1cbff3ee0a55a4aa3369c1c318a7a9,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: a775f455f10a498cbc937fc3e5fc5d34, type: 2}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: bc1cbff3ee0a55a4aa3369c1c318a7a9, type: 3}
 --- !u!1 &942056886
 GameObject:
   m_ObjectHideFlags: 0
@@ -1243,4 +1326,5 @@ SceneRoots:
   - {fileID: 6838811336240391891}
   - {fileID: 2883684744064790367}
   - {fileID: 6909847625238453055}
+  - {fileID: 457523163}
   - {fileID: 7626293101349352775}

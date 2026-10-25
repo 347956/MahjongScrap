@@ -11,6 +11,7 @@ namespace MahjongScrap.Configuration {
         public ConfigEntry<bool> EnableMahjongTiles;
         public ConfigEntry<bool> EnableMahjongSoulPaintings;
         public ConfigEntry<bool> EnableMahjongSoulHalloweenPaintings;
+        public ConfigEntry<bool> EnableMahjongSoulWinterPaintings;
         public ConfigEntry<int> MahjongSoulPaintingsSpawnWeight;
 
         public PluginConfig(ConfigFile cfg)
@@ -38,6 +39,9 @@ namespace MahjongScrap.Configuration {
 
             EnableMahjongSoulHalloweenPaintings = cfg.Bind("Paintings", "Enable Mahjong Soul Halloween paintings", true,
                 "Enables or Disables Mahjong Soul inspired Halloween paintings");
+
+            EnableMahjongSoulWinterPaintings = cfg.Bind("Paintings", "Enable Mahjong Soul Winter paintings", true,
+                "Enables or Disables Mahjong Soul inspired Winter event paintings");
 
             ClearUnusedEntries(cfg);
         }

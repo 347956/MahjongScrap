@@ -108,6 +108,7 @@ They are enabled by default.
 <summary>Click to expand/collapse</summary>
 
 - Halloween
+- Winter
 
 </details>
 

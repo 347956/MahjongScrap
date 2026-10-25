@@ -31,10 +31,11 @@ namespace MahjongScrap {
 
         private static readonly string[] PaintingNames = {
             "PaintingPortraitIchihime", "PaintingPortraitJoseph", "PaintingPortraitGroup",
-            "PaintingYakuman", "PaintingHalloween"
+            "PaintingYakuman", "PaintingHalloween", "PaintingWinter"
         };
 
         private const string HalloweenPaintingName = "PaintingHalloween";
+        private const string WinterPaintingName = "PaintingWinter";
 
         private void Awake() {
             Logger = base.Logger;
@@ -82,14 +83,20 @@ namespace MahjongScrap {
         private void RegisterScrap(IEnumerable<string> assetNames, int spawnWeight)
         {
             bool enableHalloween = BoundConfig.EnableMahjongSoulHalloweenPaintings.Value;
+            bool enableWinter = BoundConfig.EnableMahjongSoulWinterPaintings.Value;
             foreach (Item item in LoadItems(assetNames))
             {
                 NetworkPrefabs.RegisterNetworkPrefab(item.spawnPrefab);
 
-                //Halloween paintings will be loaded but set with a 0 spawnweight. This way they'll still be in game as scrap for save files but not spawnable on moons.
+                //Seasonal paintings will be loaded but set with a 0 spawnweight. This way they'll still be in game as scrap for save files but not spawnable on moons.
                 if (item.name.Equals(HalloweenPaintingName) && !enableHalloween)
                 {
                     Logger.LogInfo("Halloween paintings are disabled");
+                    Items.RegisterScrap(item, 0, Levels.LevelTypes.All);
+                }
+                else if (item.name.Equals(WinterPaintingName) && !enableWinter)
+                {
+                    Logger.LogInfo("Winter paintings are disabled");
                     Items.RegisterScrap(item, 0, Levels.LevelTypes.All);
                 }
                 else
