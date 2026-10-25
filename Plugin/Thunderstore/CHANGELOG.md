@@ -1,3 +1,12 @@
+## 1.0.5
+- Fixed the "Red Five Spawn weight" config having no effect (red fives used the normal tile weight)
+- Items missing from the asset bundle are now skipped with a warning instead of breaking loading
+- Spawn weight configs are now limited to 0-200
+- Updated LethalLib dependency to 1.2.0
+
+## 1.0.4
+Small update to the readme
+
 ## 1.0.3
 - Added Yakuman paintings:
 	- Thirteen Orphans
@@ -15,7 +24,7 @@
 
 
 ## 1.0.2
-Added new painings.
+Added new paintings.
 - Added group painting:
 	- New Year's Wishes
 - Added Joseph paintings:

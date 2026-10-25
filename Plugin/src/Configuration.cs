@@ -16,12 +16,14 @@ namespace MahjongScrap.Configuration {
         public PluginConfig(ConfigFile cfg)
         {
             MahjongTileSpawnWeight = cfg.Bind("Mahjong Tiles", "Normal Tiles Spawn weight", 20,
-                "The spawn chance weight for Mahjong Tiles, relative to other existing scrap.\n" +
-                "Goes up from 0, lower is more rare, 100 and up is very common.");
+                new ConfigDescription("The spawn chance weight for Mahjong Tiles, relative to other existing scrap.\n" +
+                "Goes up from 0, lower is more rare, 100 and up is very common.",
+                new AcceptableValueRange<int>(0, 200)));
 
             MahjongRedTileSpawnWeight = cfg.Bind("Mahjong Tiles", "Red Five Spawn weight", 5,
-                "The spawn chance weight for Red Fives, relative to other existing scrap.\n" +
-                "Goes up from 0, lower is more rare, 100 and up is very common.");
+                new ConfigDescription("The spawn chance weight for Red Fives, relative to other existing scrap.\n" +
+                "Goes up from 0, lower is more rare, 100 and up is very common.",
+                new AcceptableValueRange<int>(0, 200)));
 
             EnableMahjongTiles = cfg.Bind("Mahjong Tiles", "Enable Mahjong Tiles", true,
                 "Enables or Disables Mahjong Tiles");
@@ -30,8 +32,9 @@ namespace MahjongScrap.Configuration {
                 "Enables or Disables Mahjong Soul inspired paintings");
             
             MahjongSoulPaintingsSpawnWeight = cfg.Bind("Paintings", "SpawnWeight Mahjong Soul paintings", 5,
-                "The spawn chance weight for Mahjong Soul paintings, relative to other existing scrap.\n" +
-                "Goes up from 0, lower is more rare, 100 and up is very common.");
+                new ConfigDescription("The spawn chance weight for Mahjong Soul paintings, relative to other existing scrap.\n" +
+                "Goes up from 0, lower is more rare, 100 and up is very common.",
+                new AcceptableValueRange<int>(0, 200)));
 
             EnableMahjongSoulHalloweenPaintings = cfg.Bind("Paintings", "Enable Mahjong Soul Halloween paintings", true,
                 "Enables or Disables Mahjong Soul inspired Halloween paintings");
@@ -41,9 +44,10 @@ namespace MahjongScrap.Configuration {
 
         private void ClearUnusedEntries(ConfigFile cfg) {
             // Normally, old unused config entries don't get removed, so we do it with this piece of code. Credit to Kittenji.
-            PropertyInfo orphanedEntriesProp = cfg.GetType().GetProperty("OrphanedEntries", BindingFlags.NonPublic | BindingFlags.Instance);
-            var orphanedEntries = (Dictionary<ConfigDefinition, string>)orphanedEntriesProp.GetValue(cfg, null);
-            orphanedEntries.Clear(); // Clear orphaned entries (Unbinded/Abandoned entries)
+            PropertyInfo? orphanedEntriesProp = cfg.GetType().GetProperty("OrphanedEntries", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (orphanedEntriesProp?.GetValue(cfg, null) is Dictionary<ConfigDefinition, string> orphanedEntries) {
+                orphanedEntries.Clear(); // Clear orphaned entries (Unbinded/Abandoned entries)
+            }
             cfg.Save(); // Save the config file to save these changes
         }
     }

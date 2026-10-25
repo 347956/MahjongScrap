@@ -1,28 +1,45 @@
-﻿using System.Reflection;
-using UnityEngine;
+﻿using UnityEngine;
 using BepInEx;
 using LethalLib.Modules;
 using BepInEx.Logging;
 using System.IO;
 using MahjongScrap.Configuration;
-using System;
 using System.Collections.Generic;
 
 namespace MahjongScrap {
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
-    [BepInDependency(LethalLib.Plugin.ModGUID)] 
+    [BepInDependency(LethalLib.Plugin.ModGUID)]
     public class Plugin : BaseUnityPlugin {
         internal static new ManualLogSource Logger = null!;
         internal static PluginConfig BoundConfig { get; private set; } = null!;
         public static AssetBundle? ModAssets;
 
+        private static readonly string[] TileNames = {
+            "EastTile", "SouthTile", "WestTile", "NorthTile",
+            "GreenDragontile", "RedDragonTile", "WhiteDragonTile",
+            "PinzuOneTile", "PinzuTwoTile", "PinzuThreeTile", "PinzuFourTile", "PinzuFiveTile",
+            "PinzuSixTile", "PinzuSevenTile", "PinzuEightTile", "PinzuNineTile",
+            "SouzuOneTile", "SouzuTwoTile", "SouzuThreeTile", "SouzuFourTile", "SouzuFiveTile",
+            "SouzuSixTile", "SouzuSevenTile", "SouzuEightTile", "SouzuNineTile",
+            "ManzuOneTile", "ManzuTwoTile", "ManzuThreeTile", "ManzuFourTile", "ManzuFiveTile",
+            "ManzuSixTile", "ManzuSevenTile", "ManzuEightTile"
+        };
+
+        private static readonly string[] RedTileNames = {
+            "ManzuRedFiveTile", "PinzuRedFiveTile", "SouzuRedFiveTile"
+        };
+
+        private static readonly string[] PaintingNames = {
+            "PaintingPortraitIchihime", "PaintingPortraitJoseph", "PaintingPortraitGroup",
+            "PaintingYakuman", "PaintingHalloween"
+        };
+
+        private const string HalloweenPaintingName = "PaintingHalloween";
+
         private void Awake() {
             Logger = base.Logger;
 
-            // If you don't want your mod to use a configuration file, you can remove this line, Configuration.cs, and other references.
             BoundConfig = new PluginConfig(base.Config);
-
-            InitializeNetworkBehaviours();
 
             var bundleName = "mahjongscrapmodassets";
             ModAssets = AssetBundle.LoadFromFile(Path.Combine(Path.GetDirectoryName(Info.Location), bundleName));
@@ -36,20 +53,23 @@ namespace MahjongScrap {
             if (tilesEnabled)
             {
                 Logger.LogInfo($"EnableMahjongTiles = [{tilesEnabled}] > enabling Mahjong Tiles");
-                RegisterTiles();
+                RegisterScrap(TileNames, BoundConfig.MahjongTileSpawnWeight.Value);
+                Logger.LogInfo("Done loading normal tiles");
+                RegisterScrap(RedTileNames, BoundConfig.MahjongRedTileSpawnWeight.Value);
+                Logger.LogInfo("Done loading red fives");
             }
             else
             {
                 Logger.LogInfo($"EnableMahjongTiles = [{tilesEnabled}] > skipped loading Mahjong Tiles");
             }
 
-
             //Checks if Paintings are enabled > Registers and loads the paintings if enabled
             bool paintingsEnabled = BoundConfig.EnableMahjongSoulPaintings.Value;
             if (paintingsEnabled)
             {
                 Logger.LogInfo($"EnableMahjongSoulPaintings = [{paintingsEnabled}] > enabling Mahjong Soul Paintings");
-                RegisterPaintings();
+                RegisterScrap(PaintingNames, BoundConfig.MahjongSoulPaintingsSpawnWeight.Value);
+                Logger.LogInfo("Done loading mahjong soul paintings");
             }
             else
             {
@@ -58,175 +78,41 @@ namespace MahjongScrap {
             Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
         }
 
-        //To keep the code clean
-
-        //Register all tiles.
-        private void RegisterTiles()
+        //Loads the named items from the asset bundle and registers them as scrap. Names that can't be found are logged and skipped.
+        private void RegisterScrap(IEnumerable<string> assetNames, int spawnWeight)
         {
-            if (ModAssets == null)
+            bool enableHalloween = BoundConfig.EnableMahjongSoulHalloweenPaintings.Value;
+            foreach (Item item in LoadItems(assetNames))
             {
-                Logger.LogWarning("The asset bundle is null or not set!");
-            }
+                NetworkPrefabs.RegisterNetworkPrefab(item.spawnPrefab);
 
-            List<Item> tiles = LoadTiles();
-            List<Item> redTiles = LoadRedTiles();
-
-            if (tiles != null && tiles.Count > 0)
-            {
-                int iTileRarity = BoundConfig.MahjongTileSpawnWeight.Value;
-                foreach (Item tile in tiles)
+                //Halloween paintings will be loaded but set with a 0 spawnweight. This way they'll still be in game as scrap for save files but not spawnable on moons.
+                if (item.name.Equals(HalloweenPaintingName) && !enableHalloween)
                 {
-                    NetworkPrefabs.RegisterNetworkPrefab(tile.spawnPrefab);
-                    Items.RegisterScrap(tile, iTileRarity, Levels.LevelTypes.All);
+                    Logger.LogInfo("Halloween paintings are disabled");
+                    Items.RegisterScrap(item, 0, Levels.LevelTypes.All);
                 }
-                Logger.LogInfo("Done loading normal tiles");
-            }
-            if (redTiles != null && redTiles.Count > 0)
-            {
-                int iRedTileRarity = BoundConfig.MahjongTileSpawnWeight.Value;
-                foreach (Item tile in redTiles)
+                else
                 {
-                    NetworkPrefabs.RegisterNetworkPrefab(tile.spawnPrefab);
-                    Items.RegisterScrap(tile, iRedTileRarity, Levels.LevelTypes.All);
-                }
-                Logger.LogInfo("Done loading red fives");
-            }
-        }
-
-        //Load all normal tile Assets
-        private List<Item> LoadTiles()
-        {
-            List<Item> tiles = new List<Item>();
-            if (ModAssets != null)
-            {
-                tiles.Add(ModAssets.LoadAsset<Item>("EastTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("SouthTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("WestTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("NorthTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("GreenDragontile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("RedDragonTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("WhiteDragonTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("PinzuOneTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("PinzuTwoTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("PinzuThreeTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("PinzuFourTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("PinzuFiveTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("PinzuSixTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("PinzuSevenTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("PinzuEightTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("PinzuNineTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("SouzuOneTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("SouzuTwoTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("SouzuThreeTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("SouzuFourTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("SouzuFiveTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("SouzuSixTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("SouzuSevenTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("SouzuEightTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("SouzuNineTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("ManzuOneTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("ManzuTwoTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("ManzuThreeTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("ManzuFourTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("ManzuFiveTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("ManzuSixTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("ManzuSevenTile"));
-                tiles.Add(ModAssets.LoadAsset<Item>("ManzuEightTile"));
-            }
-            else
-            {
-                Logger.LogWarning("Something went wrong with loading the tiles");
-            }
-
-            return tiles;
-        }
-
-        //Load Red Five Assets
-        private List<Item> LoadRedTiles()
-        {
-
-            List<Item> redTiles = new List<Item>();
-
-            if (ModAssets != null) {
-                redTiles.Add(ModAssets.LoadAsset<Item>("ManzuRedFiveTile"));
-                redTiles.Add(ModAssets.LoadAsset<Item>("PinzuRedFiveTile"));
-                redTiles.Add(ModAssets.LoadAsset<Item>("SouzuRedFiveTile"));
-            }
-            else
-            {
-                Logger.LogWarning("Something went wrong with loading the red tiles");
-            }
-
-            return redTiles;
-        }
-
-        private void RegisterPaintings()
-        {
-
-            if (ModAssets == null)
-            {
-                Logger.LogWarning("The asset bundle is null or not set!");
-            }
-
-            List<Item> paintings = LoadPaintings();
-
-            if (paintings != null && paintings.Count > 0)
-            {
-                int iPaintingRarity = BoundConfig.MahjongSoulPaintingsSpawnWeight.Value;
-                bool enableHalloween = BoundConfig.EnableMahjongSoulHalloweenPaintings.Value;
-                foreach (Item painting in paintings)
-                {
-                    NetworkPrefabs.RegisterNetworkPrefab(painting.spawnPrefab);
-
-                    //Halloween paintings will be loaded but set with a 0 spawnweight. This way they'll still be in game as scrap for save files but not spawnable on moons.
-                    if (painting.name.Equals("PaintingHalloween") && !enableHalloween)
-                    {
-                        Logger.LogInfo("Halloween paintings are disabled");
-                        Items.RegisterScrap(painting, 0, Levels.LevelTypes.All);
-                    }
-                    else
-                    {
-                        Items.RegisterScrap(painting, iPaintingRarity, Levels.LevelTypes.All);
-                    }
-                }
-                Logger.LogInfo("Done loading mahjong soul paintings");
-            }
-        }
-
-
-        private List<Item> LoadPaintings()
-        {
-            List<Item> paintings = new List<Item>();
-            if (ModAssets != null)
-            {
-                paintings.Add(ModAssets.LoadAsset<Item>("PaintingPortraitIchihime"));
-                paintings.Add(ModAssets.LoadAsset<Item>("PaintingPortraitJoseph"));
-                paintings.Add(ModAssets.LoadAsset<Item>("PaintingPortraitGroup"));
-                paintings.Add(ModAssets.LoadAsset<Item>("PaintingYakuman"));
-                paintings.Add(ModAssets.LoadAsset<Item>("PaintingHalloween"));
-            }
-            else
-            {
-                Logger.LogWarning("Something went wrong with loading the paintings");
-            }
-            return paintings;
-        }
-
-        private static void InitializeNetworkBehaviours() {
-            // See https://github.com/EvaisaDev/UnityNetcodePatcher?tab=readme-ov-file#preparing-mods-for-patching
-            var types = Assembly.GetExecutingAssembly().GetTypes();
-            foreach (var type in types)
-            {
-                var methods = type.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
-                foreach (var method in methods)
-                {
-                    var attributes = method.GetCustomAttributes(typeof(RuntimeInitializeOnLoadMethodAttribute), false);
-                    if (attributes.Length > 0)
-                    {
-                        method.Invoke(null, null);
-                    }
+                    Items.RegisterScrap(item, spawnWeight, Levels.LevelTypes.All);
                 }
             }
-        } 
+        }
+
+        private List<Item> LoadItems(IEnumerable<string> assetNames)
+        {
+            List<Item> items = new List<Item>();
+            foreach (string assetName in assetNames)
+            {
+                Item? item = ModAssets!.LoadAsset<Item>(assetName);
+                if (item == null || item.spawnPrefab == null)
+                {
+                    Logger.LogWarning($"Could not load item [{assetName}] from the asset bundle, skipping it");
+                    continue;
+                }
+                items.Add(item);
+            }
+            return items;
+        }
     }
 }
